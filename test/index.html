@@ -1,0 +1,113 @@
+<!--
+ * @Author: your name
+ * @Date: 2021-07-15 14:16:49
+ * @LastEditTime: 2021-07-16 11:59:17
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \koaframe\test\index.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="./axios.min.js"></script>
+
+</head>
+<body>
+<button id="post">post</button>
+<div>
+  <span id="postValue"></span>
+</div>
+<button id="get">get</button>
+<div>
+  <span id="getValue"></span>
+</div>
+<button id="delete">delete</button>
+<div>
+  <span id="deleteValue"></span>
+</div>
+<button id="edit">edit</button>
+<div>
+  <span id="editValue"></span>
+</div>
+<button id="list">list</button>
+<div>
+  <span id="listValue"></span>
+</div>
+</body>
+<script>
+  //增加
+  document.getElementById('post').addEventListener('click',()=>{
+    axios({
+      method:'POST',
+      url:'http://localhost:3000/createResource',
+      data:{
+        name: 'Fred',
+        desc:'this id fred',
+        keyWord:'people,man',
+        resourceUrl: 'www.mego.com',
+        createDate:'2021-04-13 12:00:00',
+        sellCount:parseInt(Math.random()*1000),
+        pickPassword:'test',
+        unzipPassword:'test111',
+        type:parseInt(Math.random()*5)
+      }
+    })
+  .then(function (response) {
+    document.getElementById('postValue').innerText=JSON.stringify(response.data)
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+  })
+//查询详情
+  document.getElementById('get').addEventListener('click',()=>{
+    axios({
+      method:'GET',
+      url:'http://localhost:3000/getDetails',
+      params:{
+        id:970462
+      }
+    })
+  .then(function (response) {
+    document.getElementById('getValue').innerText=JSON.stringify(response.data)
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+  })
+
+  //删除
+  document.getElementById('delete').addEventListener('click',()=>{
+    axios({
+      method:'POST',
+      url:'http://localhost:3000/patchDeleteResource',
+      data:['970456','970457']
+    })
+  .then(function (response) {
+    document.getElementById('deleteValue').innerText=JSON.stringify(response.data)
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+  })
+
+   //列表
+   document.getElementById('list').addEventListener('click',()=>{
+    axios({
+      method:'POST',
+      url:'http://localhost:3000/queryResourceList',
+      data:{pageNum:4,pageSize:10}
+    })
+  .then(function (response) {
+    document.getElementById('listValue').innerText=JSON.stringify(response.data)
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+  })
+</script>
+</html>

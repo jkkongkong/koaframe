@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-07-14 16:30:43
- * @LastEditTime: 2021-07-16 12:00:30
+ * @LastEditTime: 2021-07-19 19:12:13
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \koaframe\controller\resourceManage.js
@@ -15,13 +15,13 @@ const createResource=(data)=>{
         // console.log(results);
         // 如果有错误就抛出
         let returnData = {
-          success: 'Failed',
+          status: 'Failed',
           data: null
         }
         if (error){
           returnData.data=error
         }else{
-          returnData.success='Success'
+          returnData.status='Success'
           returnData.data={id:results.insertId}
         };
         // 结束会话
@@ -32,7 +32,7 @@ const createResource=(data)=>{
   })
 }
 
-//创建资源
+//编辑资源
 const updateResource=(data)=>{
   return new Promise((resolve,reject)=>{
     pool.getConnection(function(err, connection) {
@@ -40,13 +40,13 @@ const updateResource=(data)=>{
         // console.log(results);
         // 如果有错误就抛出
         let returnData = {
-          success: 'Failed',
+          status: 'Failed',
           data: null
         }
         if (error){
           returnData.data=error
         }else{
-          returnData.success='Success'
+          returnData.status='Success'
           returnData.data=results
         };
         // 结束会话
@@ -65,14 +65,14 @@ const queryResource=(data)=>{
         // console.log(results);
         // 如果有错误就抛出
         let returnData = {
-          success: 'Failed',
+          status: 'Failed',
           data: null
         }
         console.log(results);
         if (error){
           returnData.data=error
         }else{
-          returnData.success='Success'
+          returnData.status='Success'
           returnData.data=results&&results.length?results[0]:{}
         };
         // 结束会话
@@ -91,14 +91,16 @@ const patchDeleteResource=(data)=>{
         // console.log(results);
         // 如果有错误就抛出
         let returnData = {
-          success: 'Failed',
+          status: 'Failed',
           data: null
         }
+        console.log("1111111111111111111111111111111");
+        console.log(data);
         console.log(results);
         if (error){
           returnData.data=error
         }else{
-          returnData.success='Success'
+          returnData.status='Success'
           returnData.data=results
         };
         // 结束会话
@@ -113,28 +115,59 @@ const patchDeleteResource=(data)=>{
 const queryResourceList=(data)=>{
   return new Promise((resolve,reject)=>{
     pool.getConnection(function(err, connection) {
-      connection.query(`select * from test limit ${(data.pageNum-1)*data.pageSize},${data.pageSize}`,(error, results) => {
+      let sql=`select * from test where 1=1`;
+      // let sql=`select * from test where 1=1`;
+      let sqlNum="select count(*) as total from test where 1=1"
+      let arr=[];
+      if(data.keyWord){
+        data.keyWord = "%"+data.keyWord+"%";
+        sql += " and name like ?";
+        sqlNum += " and name like ?";
+        arr.push(data.keyWord);
+      }
+      if(data.status!==null){
+        sql += " and status = ?";
+        sqlNum += " and status = ?";
+        arr.push(data.status);
+      }
+      if(data.type!==null){
+        sql += " and type = ?";
+        sqlNum += " and type = ?";
+        arr.push(data.type);
+      }
+      if(data.date&&data.date.length){
+        sql += " and createDate between ? and ?";
+        sqlNum += " and createDate between ? and ?";
+        arr.push(data.date[0]);
+        arr.push(data.date[1]);
+      }
+      sql += " limit ?,?";
+      arr.push(((data.pageNum-1)*data.pageSize));
+      arr.push(data.pageSize);
+      connection.query(sql,arr,(error, results) => {
         // console.log(results);
         // 如果有错误就抛出
         let returnData = {
-          success: 'Failed',
-          data: null,
-          total:0
+          status: 'Failed',
+          data: {
+            list:[],
+            total:0
+          },
         }
         if (error){
           returnData.data=error
           connection.release();
           reject(error)
         }else{
-          returnData.data=results
-          connection.query(`select count(*) as total from test`,(error, results) => {
+          returnData.data.list=results
+          connection.query(sqlNum,arr,(error, results) => {
             if (error){
               returnData.data=error
               connection.release();
               reject(error)
             }else{
-              returnData.success='Success'
-              returnData.total=results&&results.length?results[0].total:0
+              returnData.status='Success'
+              returnData.data.total=results&&results.length?results[0].total:0
 
             };
             connection.release();
@@ -142,7 +175,6 @@ const queryResourceList=(data)=>{
           })
         };
         // 结束会话
-
       })
     })
   })

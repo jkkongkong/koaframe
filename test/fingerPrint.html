@@ -1,0 +1,115 @@
+<!--
+ * @Author: your name
+ * @Date: 2021-07-21 12:05:15
+ * @LastEditTime: 2021-07-21 18:18:11
+ * @LastEditors: Please set LastEditors
+ * @Description: In User Settings Edit
+ * @FilePath: \koaframe\test\footPrint.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<style>
+.m-load,.m-load2{width:36px;height:36px;margin:100px auto;}
+ /** 加载动画的静态样式 **/
+.m-load2{position:relative;}
+.m-load2 .line div{position:absolute;left:16px;top:0;width:3px;height:36px;}
+.m-load2 .line div:before,.m-load2 .line div:after{content:'';display:block;height:50%;background:gray;border-radius:5px;}
+.m-load2 .line div:nth-child(2){-webkit-transform:rotate(30deg);}
+.m-load2 .line div:nth-child(3){-webkit-transform:rotate(60deg);}
+.m-load2 .line div:nth-child(4){-webkit-transform:rotate(90deg);}
+.m-load2 .line div:nth-child(5){-webkit-transform:rotate(120deg);}
+.m-load2 .line div:nth-child(6){-webkit-transform:rotate(150deg);}
+.m-load2 .circlebg{position:absolute;left:50%;top:50%;width:18px;height:18px;margin:-9px 0 0 -9px;background:white;border-radius:18px;}
+
+/** 加载动画 **/
+ @-webkit-keyframes load{
+     0%{opacity:0;}
+    100%{opacity:1;}
+ }
+ .m-load2 .line div:nth-child(1):before{-webkit-animation:load 1.2s linear 0s infinite;}
+ .m-load2 .line div:nth-child(2):before{-webkit-animation:load 1.2s linear 0.1s infinite;}
+ .m-load2 .line div:nth-child(3):before{-webkit-animation:load 1.2s linear 0.2s infinite;}
+ .m-load2 .line div:nth-child(4):before{-webkit-animation:load 1.2s linear 0.3s infinite;}
+ .m-load2 .line div:nth-child(5):before{-webkit-animation:load 1.2s linear 0.4s infinite;}
+ .m-load2 .line div:nth-child(6):before{-webkit-animation:load 1.2s linear 0.5s infinite;}
+ .m-load2 .line div:nth-child(1):after{-webkit-animation:load 1.2s linear 0.6s infinite;}
+ .m-load2 .line div:nth-child(2):after{-webkit-animation:load 1.2s linear 0.7s infinite;}
+ .m-load2 .line div:nth-child(3):after{-webkit-animation:load 1.2s linear 0.8s infinite;}
+ .m-load2 .line div:nth-child(4):after{-webkit-animation:load 1.2s linear 0.9s infinite;}
+ .m-load2 .line div:nth-child(5):after{-webkit-animation:load 1.2s linear 1s infinite;}
+ .m-load2 .line div:nth-child(6):after{-webkit-animation:load 1.2s linear 1.1s infinite;}
+</style>
+<body>
+  <p id="finger"></p>
+  <div class="m-load"></div>
+
+<div class="m-load2">
+     <div class="line">
+         <div></div>
+         <div></div>
+         <div></div>
+         <div></div>
+         <div></div>
+         <div></div>
+     </div>
+     <div class="circlebg"></div>
+ </div>
+</body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="http://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@3/dist/fp.min.js"></script>
+<!-- <script src="./transfer@0.1.0.min.js"></script> -->
+<script>
+function checkUser(pid,uid){
+  axios.get('http://localhost:3000/test1?pid='+pid+'&uid='+uid)
+  .then(async (response)=> {
+    let re=response.data
+    console.log(re);
+    if(re.type==1){//已经有权限
+      document.getElementById("finger").innerText=JSON.stringify(re)
+    }else if(re.type==2){//还没有权限
+      // let re=await getPostInfo(pid,uid)
+      console.log(re);
+    }
+
+  })
+  .catch(function (error) {
+    console.log(this);
+  });
+}
+function getPostInfo(pid,uid){
+  axios.get(`http://localhost:3000/test2?pid=${pid}&uid=${uid}`)
+  .then(function (response) {
+    console.log(response);
+    document.getElementById("finger").innerText=response.data
+  })
+  .catch(function (error) {
+    console.log(this);
+  });
+}
+
+window.onload=function(){
+    const postId=location.search.split('?id=')[1]
+    const maxTry=3
+    axios.defaults.timeout = 30000;
+    if(!postId){
+      alert("地址错误，请重输入")
+    }
+    const fpPromise = FingerprintJS.load()
+    fpPromise
+      .then(fp=>fp.get())
+      .then(result=>{
+        const visitorId = result.visitorId
+        checkUser(postId,visitorId)
+      })
+  }
+
+
+</script>
+
+</html>

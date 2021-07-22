@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-07-14 16:30:43
- * @LastEditTime: 2021-07-22 14:50:09
+ * @LastEditTime: 2021-07-22 18:07:45
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \koaframe\controller\resourceManage.js
@@ -180,16 +180,7 @@ const queryResourceList=(data)=>{
   })
 }
 
-//生成二维码
-const createQRCode=(info)=>{
-  return new Promise((resolve,reject)=>{
-    if(info){
-      resolve("QR code")
-    }else{
-      reject()
-    }
-  })
-}
+
 module.exports = {
   createResource,
   queryResource,

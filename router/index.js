@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2021-07-14 16:55:52
- * @LastEditTime: 2021-07-22 15:27:38
+ * @LastEditTime: 2021-07-22 18:09:36
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \koaframe\router\index.js
@@ -10,6 +10,10 @@
  const resourceManage = require('../controller/resourceManage.js');  //注意：引入的方式
  const userManage = require('../controller/userManage.js');  //注意：引入的方式
  const parseParameter=require("../utils/index.js")
+
+ router.get('/test', async function (ctx, next) {
+   ctx.body=await userManage.test()
+})
 
  router.get('/queryUserInfo', async function (ctx, next) {
   let pid=ctx.request.query.pid;
@@ -24,7 +28,7 @@
 
   let uResult=await userManage.queryUserInfo(uid)
   if(uResult.status=="Success"&&uResult.data){//有用户信息
-    let userPosts=uResult.data.split(',')
+    let userPosts=uResult.data&&uResult.data.length?uResult.data.split(','):[]
     if(userPosts.indexOf(postInfo.id.toString())!=-1){//用户有该资源,则直接返回
       response.data=postInfo
       response.type=1
@@ -34,16 +38,27 @@
       ctx.body=response
     }
   }else{//没有改用户，直接生成资源二维码返回
+    await userManage.createUser(uid)
     response.data=await resourceManage.createQRCode(postInfo)
     ctx.body=response
   }
 })
 //获取支付信息
 router.get('/getPayInfo', async function (ctx, next) {
-  ctx.body="This is a test "+ctx.request.query.pid+" "+ctx.request.query.uid;
-  if(!ctx.request.query.posts){
-    console.log("no posts");
-  }
+  let pid=ctx.request.query.pid;
+  let uid=ctx.request.query.uid;
+  // let uResult=await userManage.queryUserInfo(uid)
+  // if(uResult.status=="Success"&&uResult.data){//有用户信息
+  //   let userPosts=uResult.data&&uResult.data.length?uResult.data.split(','):[]
+  //   if(userPosts.indexOf(postInfo.id.toString())!=-1){//用户有该资源,则直接返回
+  //     response.data=postInfo
+  //     response.type=1
+  //     ctx.body=response
+  //   }else{//该用户没有该资源，生成资源二维码返回
+  //     response.data=await resourceManage.createQRCode(postInfo)
+  //     ctx.body=response
+  //   }
+  // }else{}
 })
 
 router.get('/getDetails', async function (ctx, next) {

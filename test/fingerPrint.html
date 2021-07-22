@@ -1,7 +1,7 @@
 <!--
  * @Author: your name
  * @Date: 2021-07-21 12:05:15
- * @LastEditTime: 2021-07-22 16:10:54
+ * @LastEditTime: 2021-07-22 17:44:35
  * @LastEditors: Please set LastEditors
  * @Description: In User Settings Edit
  * @FilePath: \koaframe\test\footPrint.html
@@ -148,6 +148,18 @@ function getPayInfo(pid,uid){
 function changeLoadingStatus(status){
     document.getElementById("m-load2").style.display=status?'block':'none'
 }
+function test(){
+  setInterval(()=>{
+    axios.get(`http://localhost:3000/test`)
+    .then(function (response) {
+      console.log(response);
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+  },500)
+
+}
 window.onload=function(){
   // setTimeout(()=>{
   //   changeLoadingStatus(false)
@@ -166,7 +178,8 @@ window.onload=function(){
       .then(fp=>fp.get())
       .then(result=>{
         const visitorId = result.visitorId
-        checkUser(postId,visitorId)
+        // checkUser(postId,visitorId)
+        test()
       })
   }
 
